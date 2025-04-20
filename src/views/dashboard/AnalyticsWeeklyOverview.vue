@@ -172,24 +172,17 @@ const moreList = [
     <VCardText>
       <VueApexCharts type="line" :options="options" :series="series" :height="200" />
 
-      <div class="d-flex align-center mb-1 gap-x-4">
-        <h4 class="text-h4">
-          {{ percentageChange }}%
-        </h4>
-        <p class="mb-0">
-          Your token usage is {{ percentageChange }}%
-          <span class="text-high-emphasis">{{ isImproved ? '😎' : '😔' }}</span>
-          {{ isImproved ? 'better' : 'lower' }} compared to the previous month
-        </p>
+      <div class="d-flex align-center mb-5 gap-x-4">
+        <span>
+          user usage {{ percentageChange }}%
+          {{ isImproved ? 'better😎' : 'lower😔' }} compared to the previous month
+          <strong>Days with Sales:</strong> <span class="text-success">{{ daysWithSales }}</span>,
+          <strong>Average Weekly Earning:</strong> <span class="text-success">{{ khrFormatter.format(avgWeeklyEarning)
+            }}</span>,
+          <strong>Average Daily Earning:</strong> <span class="text-success">{{ khrFormatter.format(avgDailyEarning)
+            }}</span>
+        </span>
       </div>
-
-      <p class="mb-5">
-        <strong>Days with Sales:</strong> <span class="text-success">{{ daysWithSales }}</span>,
-        <strong>Average Weekly Earning:</strong> <span class="text-success">{{ khrFormatter.format(avgWeeklyEarning)
-          }}</span>,
-        <strong>Average Daily Earning:</strong> <span class="text-success">{{ khrFormatter.format(avgDailyEarning)
-          }}</span>
-      </p>
 
       <div class="d-flex gap-x-4 mb-4">
         <VSelect v-model="selectedYear" :items="years" label="Select Year" density="compact" style="width: 150px;" />
