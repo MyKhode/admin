@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useTheme } from 'vuetify';
 
-// Define props at the top to avoid initialization errors
+// Vuetify theme hook to detect current theme
+const theme = useTheme();
+const isDark = computed(() => theme.global.name.value === 'dark');
+
+// Define props
 const props = defineProps<{
   loading: boolean;
   data: {
@@ -16,14 +22,51 @@ const props = defineProps<{
   }[];
 }>();
 
-// Filter data to include only payments with Source: Server
-const filteredData = computed(() => {
-  return props.data
+// Define two fixed soft colors for light and dark modes
+const colors = {
+  light: [
+    '#f5f5f5', // Soft blue, pastel, slightly translucent
+    'hsla(ffff, 35%, 80%, 0.1)', // Soft purple, pastel, slightly translucent
+  ],
+  dark: [
+    '#312d4b', // Soft blue-gray, darker for dark mode
+    'hsla(260, 35%, 55%, 0.2)', // Soft purple-gray, darker for dark mode
+  ],
+};
+
+// Filter data to include only payments with Source: Server and group by date
+const filteredDataWithDay = computed(() => {
+  // Group data by date
+  const groupedByDate = props.data
     .filter(item => item.msg.includes('\nSource: Server') || item.msg.includes('\n--> Source: Server 💻'))
-    .map(item => ({
-      ...item,
-      usdAmount: extractUSDAmount(item.msg),
-    }));
+    .reduce((acc, item) => {
+      const date = new Date(item.timeStamp).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push({
+        ...item,
+        usdAmount: extractUSDAmount(item.msg),
+      });
+      return acc;
+    }, {} as Record<string, any[]>);
+
+  // Assign alternating background colors per day, responsive to theme
+  let colorIndex = 0;
+  return Object.entries(groupedByDate)
+    .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime()) // Sort by date descending
+    .flatMap(([_, items]) => {
+      const bgColor = colors[isDark.value ? 'dark' : 'light'][colorIndex % 2]; // Alternate between two colors
+      colorIndex++;
+      return items.map(item => ({
+        ...item,
+        bgColor, // Assign background color for the day
+      }));
+    });
 });
 
 // Function to extract USD amount from msg
@@ -32,13 +75,13 @@ const extractUSDAmount = (msg: string): string => {
   return amountMatch ? amountMatch[1] : '0';
 };
 
-// Define headers for the data table
+// Define headers for the data table (removed Day column)
 const headers = [
   { title: 'User', key: 'username' },
   { title: 'Email', key: 'email' },
   { title: 'App', key: 'app' },
   { title: 'User Device', key: 'device' },
-  { title: 'Amount (USD)', key: 'usdAmount' }, // Changed from Tokens to Amount (USD)
+  { title: 'Amount (USD)', key: 'usdAmount' },
 ];
 
 // Resolve role variant for icons and colors
@@ -95,56 +138,62 @@ const formatTimeAgo = (timestamp: string) => {
 
 <template>
   <VCard>
-    <VDataTable :headers="headers" :items="filteredData" :items-per-page="10" :loading="props.loading"
+    <VDataTable :headers="headers" :items="filteredDataWithDay" :items-per-page="10" :loading="props.loading"
       :fixed-footer="true" item-value="id" class="text-no-wrap">
-      <!-- User -->
-      <template #item.username="{ item }">
-        <div class="d-flex align-center gap-x-4 cursor-pointer" :title="item.msg">
-          <img :src="item.avatar" width="34" height="34" style="border-radius: 50%; object-fit: cover;">
-          <div class="d-flex flex-column">
-            <h6 class="text-h6 font-weight-medium user-list-name">
-              {{ item.fullName }}
-            </h6>
-            <span class="text-sm text-medium-emphasis">
-              {{
-                new Date(Date.parse(item.timeStamp)).toLocaleString('en-US', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  timeZone: 'Asia/Phnom_Penh',
-                })
-              }}
-              ({{ formatTimeAgo(item.timeStamp) }})
-            </span>
-          </div>
-        </div>
-      </template>
-      <!-- Role -->
-      <template #item.app="{ item }">
-        <div class="d-flex gap-4">
-          <VIcon :icon="resolveUserRoleVariant(item.app).icon" :color="resolveUserRoleVariant(item.app).color"
-            size="22" />
-          <div class="text-capitalize text-high-emphasis">
-            {{ item.app }}
-          </div>
-        </div>
-      </template>
-      <!-- Status -->
-      <template #item.status="{ item }">
-        <VChip :color="resolveUserStatusVariant(item.device)" size="small" class="text-capitalize">
-          {{ item.device }}
-        </VChip>
-      </template>
-      <!-- USD Amount -->
-      <template #item.usdAmount="{ item }">
-        <div class="d-flex flex-column">
-          <span class="text-sm text-success">
-            + ${{ Number(item.usdAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            }}
-          </span>
-        </div>
+      <!-- Apply background color to rows -->
+      <template #item="{ item }">
+        <tr :style="{ backgroundColor: item.bgColor }">
+          <td>
+            <div class="d-flex align-center gap-x-4 cursor-pointer" :title="item.msg">
+              <img :src="item.avatar" width="34" height="34" style="border-radius: 50%; object-fit: cover;">
+              <div class="d-flex flex-column">
+                <h6 class="text-h6 font-weight-medium user-list-name">
+                  {{ item.fullName }}
+                </h6>
+                <span class="text-sm text-medium-emphasis">
+                  {{
+                    new Date(Date.parse(item.timeStamp)).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      timeZone: 'Asia/Phnom_Penh',
+                    })
+                  }}
+                  ({{ formatTimeAgo(item.timeStamp) }})
+                </span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span>{{ item.email }}</span>
+          </td>
+          <td>
+            <div class="d-flex gap-4">
+              <VIcon :icon="resolveUserRoleVariant(item.app).icon" :color="resolveUserRoleVariant(item.app).color"
+                size="22" />
+              <div class="text-capitalize text-high-emphasis">
+                {{ item.app }}
+              </div>
+            </div>
+          </td>
+          <td>
+            <VChip :color="resolveUserStatusVariant(item.device)" size="small" class="text-capitalize">
+              {{ item.device }}
+            </VChip>
+          </td>
+          <td>
+            <div class="d-flex flex-column">
+              <span class="text-sm text-success">
+                + ${{ Number(item.usdAmount).toLocaleString('en-US', {
+                  minimumFractionDigits: 2, maximumFractionDigits:
+                    2
+                }) }}
+              </span>
+            </div>
+          </td>
+        </tr>
       </template>
     </VDataTable>
   </VCard>
