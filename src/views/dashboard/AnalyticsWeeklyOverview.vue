@@ -178,9 +178,9 @@ const moreList = [
           {{ isImproved ? 'better😎' : 'lower😔' }} compared to the previous month
           <strong>Days with Sales:</strong> <span class="text-success">{{ daysWithSales }}</span>,
           <strong>Average Weekly Earning:</strong> <span class="text-success">{{ khrFormatter.format(avgWeeklyEarning)
-          }}</span>,
+            }}</span>,
           <strong>Average Daily Earning:</strong> <span class="text-success">{{ khrFormatter.format(avgDailyEarning)
-          }}</span>
+            }}</span>
         </span>
       </div>
 

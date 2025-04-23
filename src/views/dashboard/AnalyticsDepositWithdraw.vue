@@ -80,36 +80,23 @@ const withdraws = [
 <template>
   <VCard>
     <VRow no-gutters>
-      <VCol
-        cols="12"
-        md="6"
-      >
+      <VCol cols="12" md="6">
         <VCardItem>
           <VCardTitle>Deposit</VCardTitle>
 
           <template #append>
             <h6 class="text-h6">
-              <a
-                href="javascript:void(0)"
-                class="text-primary"
-              >View All</a>
+              <a href="javascript:void(0)" class="text-primary">View All</a>
             </h6>
           </template>
         </VCardItem>
 
         <VCardText>
           <VList class="card-list">
-            <VListItem
-              v-for="deposit in deposits"
-              :key="deposit.logo"
-            >
+            <VListItem v-for="deposit in deposits" :key="deposit.logo">
               <template #prepend>
                 <div class="me-4">
-                  <VImg
-                    :height="30"
-                    :width="30"
-                    :src="deposit.logo"
-                  />
+                  <VImg :height="30" :width="30" :src="deposit.logo" />
                 </div>
               </template>
 
@@ -132,36 +119,23 @@ const withdraws = [
 
       <VDivider :vertical="$vuetify.display.mdAndUp" />
 
-      <VCol
-        cols="12"
-        md="6"
-      >
+      <VCol cols="12" md="6">
         <VCardItem>
           <VCardTitle>Withdraw</VCardTitle>
 
           <template #append>
             <h6 class="text-h6">
-              <a
-                href="javascript:void(0)"
-                class="text-primary"
-              >View All</a>
+              <a href="javascript:void(0)" class="text-primary">View All</a>
             </h6>
           </template>
         </VCardItem>
 
         <VCardText>
           <VList class="card-list">
-            <VListItem
-              v-for="withdraw in withdraws"
-              :key="withdraw.logo"
-            >
+            <VListItem v-for="withdraw in withdraws" :key="withdraw.logo">
               <template #prepend>
                 <div class="me-4">
-                  <VImg
-                    :height="30"
-                    :width="30"
-                    :src="withdraw.logo"
-                  />
+                  <VImg :height="30" :width="30" :src="withdraw.logo" />
                 </div>
               </template>
 

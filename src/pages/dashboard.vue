@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import AnalyticsDeposit from '@/views/dashboard/AnalyticsDeposit.vue';
+import AnalyticsDepositWithdraw from '@/views/dashboard/AnalyticsDepositWithdraw.vue';
 import AnalyticsTotalEarning from '@/views/dashboard/AnalyticsTotalEarning.vue';
 import AnalyticsUserTable from '@/views/dashboard/AnalyticsUserTable.vue';
 import AnalyticsWeeklyOverview from '@/views/dashboard/AnalyticsWeeklyOverview.vue';
 import avatar1 from '@images/avatars/avatar-1.png';
-import { onMounted, ref, computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const totalProfit = {
   title: 'Total Profit',
@@ -80,7 +82,7 @@ const parseUserData = (message: any) => {
   const fullNameMatch = text.match(/User(?:name)?: (.+?)\n/);
   const avatarMatch = text.match(/User Profile: (.+?)\n/);
   const appMatch = text.match(/App ID: (.+?)\n/);
-  const deviceMatch = text.match(/User Device Type: (.+?)$/m);
+  const deviceMatch = text.match(/(?:User Device Type|Device): (.+?)$/m);
   const tokenMatch = text.match(/Paid Tokens: (.+?)\n/);
   const email = text.match(/Email: (.+?)\n/);
 
@@ -260,6 +262,11 @@ onMounted(fetchData);
         :percentageChange="dailyTokenData.percentageChange" :isImproved="dailyTokenData.isImproved"
         :daysWithSales="dailyTokenData.daysWithSales" :avgWeeklyEarning="dailyTokenData.avgWeeklyEarning"
         :avgDailyEarning="dailyTokenData.avgDailyEarning" @update:month="selectedMonth = $event" />
+    </VCol>
+
+
+    <VCol cols="12">
+      <AnalyticsDeposit :loading="loading" :data="userData" />
     </VCol>
 
     <VCol cols="12">
