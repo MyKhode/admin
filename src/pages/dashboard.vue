@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import AnalyticsDeposit from '@/views/dashboard/AnalyticsDeposit.vue';
-import AnalyticsDepositWithdraw from '@/views/dashboard/AnalyticsDepositWithdraw.vue';
 import AnalyticsTotalEarning from '@/views/dashboard/AnalyticsTotalEarning.vue';
 import AnalyticsUserTable from '@/views/dashboard/AnalyticsUserTable.vue';
 import AnalyticsWeeklyOverview from '@/views/dashboard/AnalyticsWeeklyOverview.vue';
@@ -80,7 +79,7 @@ const generateApiKey = async (): Promise<string> => {
 const parseUserData = (message: any) => {
   const text = message.text;
   const fullNameMatch = text.match(/User(?:name)?: (.+?)\n/);
-  const avatarMatch = text.match(/User Profile: (.+?)\n/);
+  const avatarMatch = text.match(/Profile: (.+?)\n/);
   const appMatch = text.match(/App ID: (.+?)\n/);
   const deviceMatch = text.match(/(?:User Device Type|Device): (.+?)$/m);
   const tokenMatch = text.match(/Paid Tokens: (.+?)\n/);

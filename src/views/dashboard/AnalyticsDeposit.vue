@@ -138,7 +138,7 @@ const formatTimeAgo = (timestamp: string) => {
 
 <template>
   <VCard>
-    <VDataTable :headers="headers" :items="filteredDataWithDay" :items-per-page="5" :loading="props.loading"
+    <VDataTable :headers="headers" :items="filteredDataWithDay" :items-per-page="7" :loading="props.loading"
       :fixed-footer="true" item-value="id" class="text-no-wrap">
       <!-- Apply background color to rows -->
       <template #item="{ item }">
